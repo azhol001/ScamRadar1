@@ -1,1 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ScamRadar — AI Scam & Deepfake Detector</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
 
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M9 4L13.5 6.5V11.5L9 14L4.5 11.5V6.5L9 4Z" fill="rgba(0,0,0,0.4)"/>
+          <circle cx="9" cy="9" r="2.5" fill="#0a0d14"/>
+        </svg>
+      </div>
+      <div class="logo-text">Scam<span>Radar</span></div>
+    </div>
+    <nav class="header-nav">
+      <button class="nav-btn active" onclick="showPage('scan', this)">Scan</button>
+      <button class="nav-btn" onclick="showPage('history', this)">History</button>
+      <button class="nav-btn" onclick="showPage('about', this)">How it Works</button>
+    </nav>
+    <div class="header-badge">
+      <div class="pulse-dot"></div>
+      Claude AI
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ===== SCAN PAGE ===== -->
+    <div class="page active" id="page-scan">
+
+      <div class="hero">
+        <div class="hero-tag">⚡ Powered by Claude AI</div>
+        <h1>Detect <span class="highlight">Scams</span> &<br>Deepfakes Instantly</h1>
+        <p>Upload images, videos, or paste suspicious URLs. Claude AI reads and reasons about every detail to identify real threats accurately.</p>
+        <div class="claude-badge">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <circle cx="7" cy="7" r="6" stroke="#a78bfa" stroke-width="1.2"/>
+            <path d="M4.5 7.5L6.5 9.5L9.5 5" stroke="#a78bfa" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Every analysis is Claude reasoning in real time — not a keyword filter
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="tabs-wrapper">
+        <button class="tab active" onclick="switchTab('image')" id="tab-image"><span>🖼️</span> Image</button>
+        <button class="tab" onclick="switchTab('video')" id="tab-video"><span>🎬</span> Video</button>
+        <button class="tab" onclick="switchTab('url')" id="tab-url"><span>🔗</span> URL / Link</button>
+      </div>
+
+      <!-- IMAGE PANEL -->
+      <div id="panel-image">
+        <div class="card">
+          <div class="upload-zone" id="drop-zone-image"
+            ondragover="handleDragOver(event,'image')"
+            ondragleave="handleDragLeave(event,'image')"
+            ondrop="handleDrop(event,'image')">
+            <div class="upload-icon">🖼️</div>
+            <div class="upload-title">Drop your image here</div>
+            <div class="upload-sub">JPG, PNG, GIF, WebP — up to 20MB</div>
+            <button class="upload-btn" onclick="document.getElementById('file-input-image').click()">↑ Choose Image</button>
+            <input type="file" id="file-input-image" accept="image/*" onchange="handleFileSelect(event,'image')">
+          </div>
+          <div class="file-preview" id="preview-image">
+            <span style="font-size:20px">🖼️</span>
+            <div>
+              <div class="preview-name" id="preview-name-image"></div>
+              <div class="preview-size" id="preview-size-image"></div>
+            </div>
+            <button class="file-preview-clear" onclick="clearFile('image')">×</button>
+          </div>
+          <div class="btn-center">
+            <button class="analyze-btn" id="btn-image" onclick="startAnalysis('image')" disabled>🔍 Analyze with Claude</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO PANEL -->
+      <div id="panel-video" style="display:none">
+        <div class="card">
+          <div class="upload-zone" id="drop-zone-video"
+            ondragover="handleDragOver(event,'video')"
+            ondragleave="handleDragLeave(event,'video')"
+            ondrop="handleDrop(event,'video')">
+            <div class="upload-icon">🎬</div>
+            <div class="upload-title">Drop your video here</div>
+            <div class="upload-sub">MP4, MOV, AVI, WebM — up to 100MB</div>
+            <button class="upload-btn" onclick="document.getElementById('file-input-video').click()">↑ Choose Video</button>
+            <input type="file" id="file-input-video" accept="video/*" onchange="handleFileSelect(event,'video')">
+          </div>
+          <div class="file-preview" id="preview-video">
+            <span style="font-size:20px">🎬</span>
+            <div>
+              <div class="preview-name" id="preview-name-video"></div>
+              <div class="preview-size" id="preview-size-video"></div>
+            </div>
+            <button class="file-preview-clear" onclick="clearFile('video')">×</button>
+          </div>
+          <div class="btn-center">
+            <button class="analyze-btn" id="btn-video" onclick="startAnalysis('video')" disabled>🔍 Analyze with Claude</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- URL PANEL -->
+      <div id="panel-url" style="display:none">
+        <div class="card">
+          <div class="input-label">Enter a suspicious URL or link</div>
+          <div class="url-input-wrap">
+            <input class="url-input" id="url-input" type="text"
+              placeholder="https://suspicious-site.com/login?ref=bank..."
+              oninput="handleUrlInput()">
+            <button class="analyze-btn" id="btn-url" onclick="startAnalysis('url')" disabled>🔍 Scan with Claude</button>
+          </div>
+          <div class="examples-row">
+            <span class="examples-label">Try:</span>
+            <button class="example-btn" onclick="setEx('http://paypa1-secure.verify-account.tk/login')">Phishing URL</button>
+            <button class="example-btn" onclick="setEx('https://google.com')">google.com</button>
+            <button class="example-btn" onclick="setEx('http://crypto-prize-winner2024.xyz/claim')">Crypto Scam</button>
+            <button class="example-btn" onclick="setEx('https://github.com')">github.com</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULTS AREA -->
+      <div class="analysis-section" id="analysis-area">
+        <!-- Loading -->
+        <div class="card" id="loading-panel">
+          <div class="loading-panel">
+            <div class="scan-ring"></div>
+            <div class="loading-text">Claude is analyzing...</div>
+            <div class="loading-sub">Reading and reasoning about your content</div>
+            <div class="stream-log" id="stream-log"></div>
+          </div>
+        </div>
+        <!-- Results -->
+        <div class="card" id="results-panel" style="display:none">
+          <div class="result-header">
+            <div class="result-title">Analysis Complete</div>
+            <div class="verdict-badge" id="verdict-badge"></div>
+          </div>
+          <div class="claude-attr">
+            <div class="claude-attr-dot"></div>
+            Analyzed by Claude AI (claude-sonnet-4-20250514)
+          </div>
+          <div class="score-grid">
+            <div class="score-ring-wrap">
+              <svg width="90" height="90" viewBox="0 0 90 90">
+                <circle cx="45" cy="45" r="38" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="6"/>
+                <circle cx="45" cy="45" r="38" fill="none" id="score-arc" stroke-width="6" stroke-linecap="round" stroke-dasharray="239" stroke-dashoffset="239"/>
+              </svg>
+              <div class="score-center">
+                <span class="score-num" id="score-display">0</span>
+                <span class="score-label">/100</span>
+              </div>
+            </div>
+            <div class="score-info">
+              <h3 id="threat-type-label">—</h3>
+              <p id="threat-summary">—</p>
+              <div class="confidence-bar-wrap">
+                <div class="confidence-bar-bg">
+                  <div class="confidence-bar-fill" id="conf-bar" style="width:0%"></div>
+                </div>
+                <div class="confidence-label" id="conf-label">—</div>
+              </div>
+            </div>
+          </div>
+          <div class="meta-grid" id="meta-grid"></div>
+          <div class="flags-section">
+            <h4>Claude's Findings</h4>
+            <div id="flags-list"></div>
+          </div>
+          <div id="rec-box-wrap"></div>
+          <button class="new-scan-btn" onclick="resetScan()">← New Scan</button>
+        </div>
+      </div>
+
+    </div><!-- end page-scan -->
+
+    <!-- ===== HISTORY PAGE ===== -->
+    <div class="page" id="page-history">
+      <div class="page-header">
+        <div class="page-title">Scan History</div>
+        <div class="page-sub">Your recent Claude AI analyses</div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Total Scans</div></div>
+        <div class="stat-card"><div class="stat-num danger" id="stat-danger">0</div><div class="stat-label">Threats Found</div></div>
+        <div class="stat-card"><div class="stat-num warning" id="stat-warn">0</div><div class="stat-label">Suspicious</div></div>
+        <div class="stat-card"><div class="stat-num safe" id="stat-safe">0</div><div class="stat-label">Safe</div></div>
+      </div>
+      <div class="card">
+        <div id="history-list">
+          <div class="empty-state">No scans yet. Run your first analysis to see history here.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ABOUT PAGE ===== -->
+    <div class="page" id="page-about">
+      <div class="page-header">
+        <div class="page-title">How ScamRadar Works</div>
+        <div class="page-sub">Claude AI is the brain behind every analysis</div>
+      </div>
+      <div class="features-grid">
+        <div class="card feature-card" style="border-left:3px solid var(--accent)">
+          <div class="feature-icon">🖼️</div>
+          <div class="feature-title">Image Analysis</div>
+          <div class="feature-desc">Claude actually sees your image and inspects it for deepfake artifacts, AI-generation signs, facial inconsistencies, lighting anomalies, and scam content patterns.</div>
+        </div>
+        <div class="card feature-card" style="border-left:3px solid var(--info)">
+          <div class="feature-icon">🎬</div>
+          <div class="feature-title">Video Analysis</div>
+          <div class="feature-desc">Claude assesses video filename, format, and metadata to identify deepfakes, synthetic media, and manipulated footage indicators.</div>
+        </div>
+        <div class="card feature-card" style="border-left:3px solid var(--warning)">
+          <div class="feature-icon">🔗</div>
+          <div class="feature-title">URL Analysis</div>
+          <div class="feature-desc">Claude reasons about domain, TLD, path, subdomains, and query strings to spot phishing, brand impersonation, and scam patterns with high accuracy.</div>
+        </div>
+        <div class="card feature-card" style="border-left:3px solid #a78bfa">
+          <div class="feature-icon">🤖</div>
+          <div class="feature-title">Claude AI Engine</div>
+          <div class="feature-desc">Every result is Claude reasoning in real time — not a pattern matcher. Claude explains exactly why something is safe or dangerous like a trained cybersecurity expert.</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="risk-guide-title">Risk Score Guide</div>
+        <div class="risk-guide">
+          <div class="risk-row"><span class="risk-score safe">0–25</span><div class="risk-bar" style="background:rgba(0,229,160,0.3)"></div><span class="risk-desc">Safe — No threats detected</span></div>
+          <div class="risk-row"><span class="risk-score info">26–50</span><div class="risk-bar" style="background:rgba(61,158,255,0.3)"></div><span class="risk-desc">Suspicious — Proceed with caution</span></div>
+          <div class="risk-row"><span class="risk-score warning">51–75</span><div class="risk-bar" style="background:rgba(255,165,2,0.3)"></div><span class="risk-desc">Warning — High probability of threat</span></div>
+          <div class="risk-row"><span class="risk-score danger">76–100</span><div class="risk-bar" style="background:rgba(255,71,87,0.3)"></div><span class="risk-desc">Danger — Do not interact</span></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
