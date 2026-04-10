@@ -1,0 +1,13 @@
+# ============================================
+# .gitignore — files NOT uploaded to GitHub
+# ============================================
+
+# Secret keys — NEVER upload this
+backend/.env
+
+# Node modules — too large, reinstalled with npm install
+backend/node_modules/
+
+# System files
+.DS_Store
+Thumbs.db
